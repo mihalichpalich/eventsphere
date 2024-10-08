@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  # Frontend Service
+  frontend:
+    build:
+      context: ./frontend
+    container_name: frontend
+    ports:
+      - '3000:3000'
+    depends_on:
+      - backend
+    environment:
+      - VITE_API_URL=http://localhost:4000/api
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    command: npm run dev
+
+  # Backend Service
+  backend:
+    build:
+      context: ./backend
+    container_name: backend
+    ports:
+      - '4000:4000'
+    depends_on:
+      - mongo
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/eventsphere
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    command: npm run start:dev
+
+  # MongoDB Service
+  mongo:
+    image: mongo:latest
+    container_name: mongo
+    ports:
+      - '27017:27017'
+    volumes:
+      - mongo_data:/data/db
+
+volumes:
+  mongo_data:
